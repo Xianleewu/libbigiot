@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "connection.h"
+#include "device_control.h"
 
 static pthread_t recieve_thread;
 static pthread_t connect_thread;
@@ -161,6 +162,9 @@ int bigiot_recieve_callback(bigiot_connection* connection, char* data, int len)
         printf("Device is online!\n");
         connection->is_connected = 1;
         connection->is_registered = 0;
+    } else if(strstr(data, "play")) {
+        printf("got play cmd\n");
+        call_device_control_func(DEVICE_CONTROL_CMD_PLAY, data);
     } else {
         printf("Can't handle this message yet!\n");
     }
