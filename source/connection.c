@@ -81,6 +81,7 @@ void* connection_service(void* arg)
             connection->is_registered = 0;
 
             if(connection->socketfd > 0) {
+                shutdown(connection->socketfd, SHUT_RDWR);
                 close(connection->socketfd);
                 connection->socketfd = -1;
                 sockfd = -1;
