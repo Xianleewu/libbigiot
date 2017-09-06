@@ -126,9 +126,9 @@ void* recieve_data_thread(void *arg)
             if(recv_len < 0) {
                 printf("Recieve data error!\n");
                 connection->send_failed++;
+            } else {
+                printf("--->data from server:\n%s\n", recieve_buf);
             }
-
-            printf("--->data from server:\n%s\n", recieve_buf);
 
             if(connection->recv_callback) {
                 connection->recv_callback(connection, recieve_buf, recv_len);
