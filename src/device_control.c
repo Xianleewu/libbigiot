@@ -25,6 +25,7 @@
 
 void on_play_func(void* arg)
 {
+    (void)(arg);
     // TODO:
     bigiot_upload_picture();
     printf("called on play func!\n");
@@ -32,18 +33,21 @@ void on_play_func(void* arg)
 
 void on_pause_func(void* arg)
 {
+    (void)(arg);
     // TODO:
     printf("called on pause func!\n");
 }
 
 void on_stop_func(void* arg)
 {
+    (void)(arg);
     // TODO:
     printf("called on stop func!\n");
 }
 
 void on_left_func(void* arg)
 {
+    (void)(arg);
     // TODO:
     printf("called on left func!\n");
 }

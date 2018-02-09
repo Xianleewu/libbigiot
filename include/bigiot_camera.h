@@ -19,6 +19,7 @@
 #ifndef _BIGIOT_CAMERA_H_
 #define _BIGIOT_CAMERA_H_
 
-int bigiot_upload_picture();
+int bigiot_upload_picture(const char* device, int w, int h, const char* key,
+        int did, int inputid);
 
 #endif

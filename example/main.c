@@ -20,6 +20,7 @@ bigiot_connection connection;
 
 void on_socket_closed(int arg)
 {
+    (void)(arg);
     printf("Socket closeed!\n");
     connection.is_connected = 0;
     connection.is_registered = 0;

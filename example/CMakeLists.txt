@@ -6,4 +6,4 @@ aux_source_directory (. BIGIOT_TEST_SOURCE)
 add_executable (bigiottest ${BIGIOT_TEST_SOURCE})
 
 include_directories (../include)
-target_link_libraries (bigiottest bigiot pthread jpeg)
+target_link_libraries (bigiottest bigiot curl pthread jpeg)

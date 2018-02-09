@@ -2,30 +2,53 @@
 #include "stdlib.h"
 #include "string.h"
 #include "capture.h"
+#include "curl/curl.h"
 #include "bigiot_camera.h"
 
-#define API_KEY     "9f95cd713"
-#define DEVICE_ID   2534
-#define INPUT_ID    2406
+#define MAX_URL_LEN     (512)
+#define MAX_URL_HDR_LEN (128)
+#define API_KEY         "9f95cd713"
+#define DEVICE_ID       (2534)
+#define INPUT_ID        (2406)
 
-int bigiot_photo_post(char* filename, char* key, int did, int inputid)
+int bigiot_photo_upload(const char* filename, const char* key, int did, int inputid)
 {
-    char post_cmd[512] = {0};
+    struct curl_httppost *post = NULL;
+    struct curl_httppost *last = NULL;
+    struct curl_slist* chunk = NULL;
+    char dst_url[MAX_URL_LEN] = {0};
+    char usrl_header[MAX_URL_HDR_LEN] = {0};
+    CURL *curl = NULL;
+    CURLcode ret;
 
-    memset(post_cmd, 0, 512);
+    snprintf(dst_url, MAX_URL_LEN, "https://www.bigiot.net/pubapi/uploadImg/did/%d/inputid/%d", did, inputid);
+    snprintf(usrl_header, MAX_URL_HDR_LEN, "API-KEY: %s", key);
 
-    snprintf(post_cmd, 512, "curl --request POST -F \"data=@%s\" --header \"API-KEY: %s\" https://www.bigiot.net/pubapi/uploadImg/did/%d/inputid/%d",
-             filename, key, did, inputid);
+    curl = curl_easy_init();
 
-    printf("do post:\n%s\n", post_cmd);
+    curl_formadd(&post,
+            &last,
+            CURLFORM_COPYNAME, "data",
+            CURLFORM_FILE, filename,
+            CURLFORM_END);
 
-    return system(post_cmd);
+    chunk = curl_slist_append(chunk, usrl_header);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    curl_easy_setopt(curl, CURLOPT_URL, dst_url);
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, post);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    ret = curl_easy_perform(curl);
+    curl_formfree(post);
+    curl_easy_cleanup(curl);
+
+    return 0;
 }
 
-int bigiot_upload_picture()
+int bigiot_upload_cam(const char* device, int w, int h, const char* key,
+        int did, int inputid)
 {
-    char filename[] = {"/tmp/bigiot.jpg"};
-    camera_t* camera = camera_open("/dev/video0", 352, 288);
+    const char* filename = "/tmp/post.jpg";
+    camera_t* camera = camera_open(device, w, h);
     camera_init(camera);
     camera_start(camera);
 
@@ -45,11 +68,12 @@ int bigiot_upload_picture()
     fclose(out);
     free(rgb);
 
-    bigiot_photo_post(filename, API_KEY, DEVICE_ID, INPUT_ID);
+    bigiot_photo_upload(filename, key, did, inputid);
 
     camera_stop(camera);
     camera_finish(camera);
     camera_close(camera);
+
     return 0;
 }
 
